@@ -134,3 +134,21 @@ La desenvoltura sólo ocurre cuando la referencia está contenida dentro de un o
 - `watch(sources, function, {...opcion: true/false)`
   
   - `sources`: Puede ser una `ref`, un objeto reactivo (creado con `reactive`), un getter o un array de múltiples fuentes.
+  
+  - Si las fuentes `sources` se utilizan dentro de la función de callback, podemos gestionar las dependencias de las fuentes automáticamente con `watchEffect(function)`.
+
+- **Diferencias `watch` y `watchEffect`**.
+  
+  - El primero sólo activa la función callback cuando cambian las fuentes especificadas como argumentos.
+  
+  - El segundo activa la función callback cuando cualquiera de los elementos reactivos accedidos en la función cambian.
+
+- Si hacemos peticiones asíncronas, puede ser que haya ocurrido un cambio de estado antes de terminar la primera petición. Se lanza otra nueva, pero estamos con una petición obsoleta. Ver [Side-Effect Cleanup](https://vuejs.org/guide/essentials/watchers.html#side-effect-cleanup).
+
+- Opciones para decidir cúando se lanza el efecto colateral `watch`:
+  
+  - `flush: 'post'`: Ocurre `watch` después de que Vue actualice el estado del componente.
+  
+  - `flush: 'sync'`: Se lanza síncronamente, antes de que Vue actualice.
+
+- El `watch` se detiene cuando llamas a `unwatch` o cuando se "desmonta" el componente (`unmount`).
