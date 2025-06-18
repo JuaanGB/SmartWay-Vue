@@ -74,3 +74,63 @@ La desenvoltura sólo ocurre cuando la referencia está contenida dentro de un o
 ## Computed Properties VS Métodos.
 
 - Los métodos son evaluados cada vez que se renderiza el componente. Las computed properties cuando el estado cambia (se cachean).
+
+## `v-if` VS `v-show`.
+
+- `v-if`: Renderiza o no un componente en función de la veracidaz del valor del atributo. Existen también etiquetas como `v-else-if` y `v-else` para renderizar todo tipo de condicionales.
+  
+  - Si queremos condicional en un grupo de elementos, podemos agregar el elemento `<template>` dentro de la propia `<template>` del SFC.
+
+- `v-show`: Cambia la visibilidad en función de la veracidad del atributo. Aquí el elemento siempre está renderizado.
+
+## `v-for` para renderizar listas.
+
+- Un atributo `v-for: item in items`, donde `items` es una variable de la sección `<script>`. `item` es el alias para el objeto de la iteración actual.
+
+- Añadir atributo `:key` para poder asegurar la reactividad. Tiene que ser único. Puede ser `index`, que es un alias automático en `v-for: (item, index) in items` o un atributo del objeto.
+
+- También se pueden hacer `for` anidados.
+
+- De nuevo, podría poner el atributo en un elemento `<template>` si necesitase agrupar varios elementos.
+
+- `v-if` se ejecuta antes que `v-for`. Si `v-if` accede al item de iteración de `v-for`, no tiene ámbito por ser evaluado antes.
+
+## Manejar eventos.
+
+- `v-on:evento` abreviado como `@evento`.
+
+- Para acceder al evento, pasarlo como argumento declarado en función flecha o como `$event`.
+
+- **Modificadores**: 
+  
+  - `.stop`: Evita la propagación de eventos (`event.stopPropagation()`)
+  
+  - `.prevent`: Detiene el comportamiento por defecto del navegador en ese componente. Por ejemplo, recargar la página en un botón de submit (`event.preventDefault()`)
+  
+  - `.self`: Sólo llama al manejador si el target es el propio elemento.
+  
+  - `.capture`:
+  
+  - `.once`: El manejador sólo se llama una vez. Cuando se llama, se elimina el manejador.
+  
+  - `.passive`: No llama a `preventDefault()`.
+
+- **Modificadores con teclas**:
+  
+  - `@keyup` o `@keydown`: Eventos cuando se suelta o se clica una tecla, respectivamente.
+  
+  - Sus modificadores: `.enter`, `.tab`, `.delete`, `.esc`, etc.
+  
+  - Combinación de teclas con concatenación de modificadores: `@keyup.ctrl.enter`.
+    
+    - Modificador `.exact`: Combinación exacta de teclas.
+  
+  - Botones del ratón: `.left`, `.middle` y `.right`.
+
+## Watchers.
+
+- Cuando cambie una propiedad reactiva, ejecutar una función. A lo mejor el cambio de estado desencadena un cambio como modificar el DOM.
+
+- `watch(sources, function, {...opcion: true/false)`
+  
+  - `sources`: Puede ser una `ref`, un objeto reactivo (creado con `reactive`), un getter o un array de múltiples fuentes.
