@@ -6,11 +6,9 @@
     const emit = defineEmits(['anadirTarea'])
 
     function anadirTarea() {
-        emit('anadirTarea', titulo, descripcion)
-        /*
+        emit('anadirTarea', titulo.value, descripcion.value)
         titulo.value = ''
         descripcion.value = ''
-        */
     }
 
 </script>

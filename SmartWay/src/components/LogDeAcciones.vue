@@ -2,7 +2,6 @@
 
     defineProps(['texto'])
 
-
 </script>
 
 <template>
