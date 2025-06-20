@@ -2,16 +2,17 @@
 import { computed, ref, watch } from 'vue';
 import TarjetaTarea from './components/TarjetaTarea.vue'
 import FormularioNuevaTarea from './components/FormularioNuevaTarea.vue';
+import Encabezado from './components/Encabezado.vue';
+import FormularioFiltrar from './components/FormularioFiltrar.vue';
+import LogDeAcciones from './components/LogDeAcciones.vue';
 
 let id=1
 const tarjetas = ref([
   {id: id++, titulo: "Titulo tarjeta 1", descripcion: "descripcion 1", completa: false},
   {id: id++, titulo: "Titulo tarjeta 2", descripcion: "descripcion segunda tarjeta", completa: true},
-  {id: id++, titulo: "x", descripcion: "x", completa: false}
+  {id: id++, titulo: "x", descripcion: "x", completa: false},
+  {} /* Para probar valores por defecto de defineProps */
 ])
-
-console.log(tarjetas)
-
 const text = ref('');
 const log = ref('Log de acciones: \n');
 
@@ -19,30 +20,34 @@ const log = ref('Log de acciones: \n');
 Hacer copia:
 [...array].reverse() */
 
-const tarjetasFiltradasTitulo = computed( () => {
-  return tarjetas.value.filter( (t) => {
-    if (text.value) /* Hay texto introducido */
-      return t.titulo.includes(text.value);
-    return true;
-  });
+/* Patrón decorador para filtros: Quiero añadir un filtro por completa/no completa además de búsqueda por nombre */
+
+const tarjetasFiltradasTitulo = computed(() => {
+  return tarjetas.value.filter(t => {
+    return text.value ? t.titulo?.includes(text.value) : true
+  })
 })
 
-watch(text, () => {
-  log.value += "Has filtrado con título: " + text.value + "\n"; /* Cambiar por objeto no reactivo (crear copia de string) */
-})
+function buscarTarea(nuevoTexto) {
+  text.value = nuevoTexto
+  log.value += `Has filtrado con título: ${nuevoTexto}\n`
+}
 
 function borrarTareaPorId(id) {
+  const t = tarjetas.value.find( t => t.id === id)
   tarjetas.value = tarjetas.value.filter( t => t.id !== id)
-  console.log("He borrado la tarjeta con id: " + id);
+  log.value += `Tarea '${t.titulo}' borrada.\n`
 }
 
 function anadirTarea(titulo, descripcion) {
   tarjetas.value.push({id: id++, titulo: titulo, descripcion: descripcion})
+  log.value += `Nueva tarea '${titulo.value}' creada.\n`
 }
 
-function guardarCambios({id, titulo, descripcion}) {
-  let tarea = tarjetas.value.find( t => t.id === id)
+function guardarCambios({ id, titulo, descripcion }) {
+  const tarea = tarjetas.value.find(t => t.id === id)
   if (tarea) {
+    log.value += `Tarea '${titulo}' editada.\n`
     tarea.titulo = titulo
     tarea.descripcion = descripcion
   }
@@ -51,19 +56,27 @@ function guardarCambios({id, titulo, descripcion}) {
 </script>
 
 <template>
-  <main class="flex flex-col gap-2">
-    <FormularioNuevaTarea @anadir-tarea="(titulo, descripcion) => anadirTarea(titulo, descripcion)"></FormularioNuevaTarea>
-    <input v-model.trim="text" type="text" placeholder="Busca por título" class="bg-gray-200">
-    <p>Buscando tarjetas con titulo: {{ text }}</p>
-    <TarjetaTarea 
-      @borrar-tarea="(id) => borrarTareaPorId(id)" 
-      @guardar-cambios="guardarCambios"
-      v-for="(tarj, index) in tarjetasFiltradasTitulo" 
-      :id="tarj.id" :titulo="tarj.titulo" :descripcion="tarj.descripcion" :key="tarj.id" :completa="tarj.completa"
-      :class="{ 'tarea-hecha': tarj.completa}"
-    ></TarjetaTarea>
+  <header>
+    <Encabezado>Anótalo!</Encabezado>
+  </header>
+  <main class="bg-yellow-100 flex flex-wrap flex-col gap-2">
+    <section class="p-10 flex flex-row justify-center gap-2">
+      <FormularioNuevaTarea @anadir-tarea="(titulo, descripcion) => anadirTarea(titulo, descripcion)"></FormularioNuevaTarea>
+      <FormularioFiltrar @buscar-tarea="buscarTarea"></FormularioFiltrar>
+      <LogDeAcciones :texto="log"></LogDeAcciones>
+    </section>
+    <h2 class="divider text-2xl">Lista de tareas</h2>
+    <section class="grid grid-cols-1 md:grid-cols-3 justify-center gap-2">
+      <TarjetaTarea 
+        @borrar-tarea="(id) => borrarTareaPorId(id)" 
+        @guardar-cambios="guardarCambios"
+        v-for="(tarj, index) in tarjetasFiltradasTitulo" 
+        :tarea="tarj" :key="tarj.id"
+        :class="{ 'tarea-hecha': tarj.completa}"
+      ></TarjetaTarea>
+    </section>
+    
   </main>
-  <span id="log" class="bg-gray-200 whitespace-pre-line">{{ log }}</span>
 </template>
 
 <style> 

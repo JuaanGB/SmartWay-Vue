@@ -152,3 +152,9 @@ La desenvoltura sólo ocurre cuando la referencia está contenida dentro de un o
   - `flush: 'sync'`: Se lanza síncronamente, antes de que Vue actualice.
 
 - El `watch` se detiene cuando llamas a `unwatch` o cuando se "desmonta" el componente (`unmount`).
+
+## defineProps([...])
+
+- Permite definir los atributos que se pueden establecer desde componentes externos:
+  
+  - `defineProps(['titulo', 'descripcion'])`: Permite hacer binding de `:titulo` y `:descripcion` desde un componente padre. 

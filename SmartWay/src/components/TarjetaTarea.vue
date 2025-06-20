@@ -1,12 +1,22 @@
 <script setup>
-    import { ref } from 'vue'
+    import { ref, watch } from 'vue'
 
-    const props = defineProps(["id", "titulo", "descripcion", "completa"])
+    const props = defineProps({
+        tarea: {
+            type: Object,
+            default: {
+                titulo: "Titulo",
+                descripcion: "Descripcion",
+                completa: false,
+                id: -1
+            }
+        }
+    })
 
-    let id = props.id
-    let titulo = ref(props.titulo)
-    let descripcion = ref(props.descripcion)
-    let completa = ref(!props.completa)
+    let id = props.tarea.id
+    let titulo = ref(props.tarea.titulo)
+    let descripcion = ref(props.tarea.descripcion)
+    let completa = ref(!props.tarea.completa)
 
     let editMode = ref(false)
 
@@ -19,17 +29,17 @@
         completa.value = !completa.value;
     }
 
-    function activarEdicion(event) {
+    function activarEdicion() {
         editMode.value = !editMode.value;
     }
 </script>
 
 
 <template>
-    <article class="card bg-red-100 p-4 shadow-sm w-1/4">
+    <article class="card bg-yellow-300 p-4 shadow-sm w-[400px] m-auto">
         <div class="card-title">
-            <h2 v-if="!editMode" @click="tareaHecha($event)">{{ titulo }}</h2>
-            <textarea v-else :disabled="!editMode" :value="titulo" v-model="titulo" class="enabled:border p-1 w-auto whitespace-break-spaces"></textarea>
+            <h2 v-if="!editMode" @click="tareaHecha($event)">{{ titulo ?? "* No hay título" }}</h2>
+            <textarea v-else :disabled="!editMode" :value="titulo" v-model="titulo" class="textarea bg-yellow-100 text-lg font-bold border-1 p-1 w-auto whitespace-break-spaces"></textarea>
             <button class="btn btn-sm btn-circle text-xl ml-auto mb-auto shadow-sm"
                 :disabled="!completa"
                 @click="activarEdicion($event)"
@@ -43,8 +53,8 @@
             </button>
         </div>
         <div class="card-body p-0 pt-2">
-            <p v-if="!editMode">{{ descripcion }}</p>
-            <textarea v-else :disabled="!editMode" :value="descripcion" v-model="descripcion" class="enabled:border p-1 w-auto"></textarea>
+            <p v-if="!editMode">{{ descripcion ?? "* No hay descripción" }}</p>
+            <textarea v-else :disabled="!editMode" :value="descripcion" v-model="descripcion" class="textarea bg-yellow-100 border-1 p-1 w-auto"></textarea>
         </div>
         <div class="card-actions">
             <button v-show="editMode" class="btn ml-auto mt-2"
@@ -59,12 +69,20 @@ h2:hover {
 }
 
 article.tarea-hecha {
-    background-color: green; /* Cómo usar clases Tailwind aquí? */
+  background-image: url('../assets/posit-arrugado.png');
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
 }
+
 
 article.tarea-hecha h2, article.tarea-hecha p {
     text-decoration: line-through;
-    color: gray;
+}
+
+article.tarea-hecha h2:hover {
+    text-decoration: none;
+    color: black;
 }
 
 button:disabled {
