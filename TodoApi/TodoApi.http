@@ -1,6 +1,17 @@
-@TodoApi_HostAddress = http://localhost:5165
+@TodoApi_HostAddress = http://localhost:5165/api/todoitems/
 
-GET {{TodoApi_HostAddress}}/weatherforecast/
+GET {{TodoApi_HostAddress}}/1
 Accept: application/json
+
+###
+
+POST {{@TodoApi_HostAddress}}/1
+Accept: application/json
+
+{
+    "id": 0,
+    "name": "tarea",
+    "isComplete": false 
+}
 
 ###
