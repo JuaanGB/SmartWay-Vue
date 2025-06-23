@@ -14,6 +14,7 @@
     })
 
     let tarea = props.tarea
+    let id = props.tarea.id
 
     let editMode = ref(false)
     let tituloEdit = tarea.titulo
@@ -44,12 +45,16 @@
     <article class="card bg-yellow-300 p-4 shadow-sm w-[400px] m-auto">
         <div class="card-title">
             <h2 v-if="!editMode" @click="tareaHecha($event)">{{ tarea.titulo || "* No hay título" }}</h2>
-            <textarea v-else :disabled="!editMode" v-model="tituloEdit" class="textarea bg-yellow-100 text-lg font-bold border-1 p-1 w-auto whitespace-break-spaces"></textarea>
+            <textarea :id="'editar-titulo-'+id" v-else :disabled="!editMode" v-model="tituloEdit" class="textarea bg-yellow-100 text-lg font-bold border-1 p-1 w-auto whitespace-break-spaces"></textarea>
             <button class="btn btn-sm btn-circle text-xl ml-auto mb-auto shadow-sm"
                 :disabled="tarea.completa"
                 @click="activarEdicion($event)"
             >
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><!-- Icon from HeroIcons by Refactoring UI Inc - https://github.com/tailwindlabs/heroicons/blob/master/LICENSE --><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="m16.862 4.487l1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8l.8-2.685a4.5 4.5 0 0 1 1.13-1.897zm0 0L19.5 7.125"/></svg>
+                <svg v-show="!editMode" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><!-- Icon from HeroIcons by Refactoring UI Inc - https://github.com/tailwindlabs/heroicons/blob/master/LICENSE --><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="m16.862 4.487l1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8l.8-2.685a4.5 4.5 0 0 1 1.13-1.897zm0 0L19.5 7.125"/></svg>
+                <svg v-show="editMode" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+  <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+</svg>
+
             </button>
             <button class="btn btn-sm btn-circle text-xl mb-auto shadow-sm"
                 @click="$emit('borrarTarea', tarea.id)"
@@ -59,7 +64,7 @@
         </div>
         <div class="card-body p-0 pt-2">
             <p v-if="!editMode">{{ tarea.descripcion || "* No hay descripción" }}</p>
-            <textarea v-else :disabled="!editMode" v-model="descripcionEdit" class="textarea bg-yellow-100 border-1 p-1 w-auto"></textarea>
+            <textarea :id="'editar-descripcion-'+id" v-else :disabled="!editMode" v-model="descripcionEdit" class="textarea bg-yellow-100 border-1 p-1 w-auto"></textarea>
         </div>
         <div class="card-actions">
             <button v-show="editMode" class="btn ml-auto mt-2"

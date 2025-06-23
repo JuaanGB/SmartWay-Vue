@@ -5,6 +5,7 @@ import FormularioNuevaTarea from './components/FormularioNuevaTarea.vue';
 import Encabezado from './components/Encabezado.vue';
 import FormularioFiltrar from './components/FormularioFiltrar.vue';
 import LogDeAcciones from './components/LogDeAcciones.vue';
+import * as op from './operaciones';
 
 let id=1
 const tarjetas = ref([
@@ -42,9 +43,13 @@ function buscarTarea(nuevoTexto) {
 }
 
 function borrarTareaPorId(id) {
+  /*
   const t = tarjetas.value.find( t => t.id === id)
   tarjetas.value = tarjetas.value.filter( t => t.id !== id)
-  log.value += `Tarea '${t.titulo}' borrada.\n`
+  */
+  op.eliminarTarea(id, tarjetas)
+  console.log(tarjetas)
+  log.value += `Tarea '${tarjetas.value.find(t => t.id == id).titulo}' borrada.\n`
 }
 
 function anadirTarea(titulo, descripcion) {
@@ -52,15 +57,22 @@ function anadirTarea(titulo, descripcion) {
     log.value += `Título necesario al crear una tarea.\n`
     return
   }
+  op.anadirTarea(tarjetas)
+  log.value += `Nueva tarea '${titulo}' creada.\n`
+  /*
   tarjetas.value.push({id: id++, titulo: titulo, descripcion: descripcion})
   log.value += `Nueva tarea '${titulo}' creada.\n`
+  */
 }
 
 function guardarCambios({ id, titulo, descripcion }) {
   const tarea = tarjetas.value.find(t => t.id === id)
   if (tarea) {
+    op.actualizarTarea(id, tarea.completa, tarjetas)
+    /*
     tarea.titulo = titulo
     tarea.descripcion = descripcion
+    */
     log.value += `Tarea '${tarea.titulo}' editada.\n`
   }
 }

@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TodoApi.Models;
 
 namespace TodoApi.Controllers;
@@ -60,8 +61,9 @@ public class TodoItemsController : ControllerBase
             return NotFound();
         }
 
-        todoItem.Name = todoDTO.Name;
-        todoItem.IsComplete = todoDTO.IsComplete;
+        todoItem.Titulo = todoDTO.Titulo;
+        todoItem.Completa = todoDTO.Completa;
+        todoItem.Descripcion = todoDTO.Descripcion;
 
         try
         {
@@ -84,8 +86,9 @@ public class TodoItemsController : ControllerBase
     {
         var todoItem = new TodoItem
         {
-            IsComplete = todoDTO.IsComplete,
-            Name = todoDTO.Name
+            Completa = todoDTO.Completa,
+            Titulo = todoDTO.Titulo,
+            Descripcion = todoDTO.Descripcion
         };
 
         _context.TodoItems.Add(todoItem);
@@ -123,7 +126,8 @@ public class TodoItemsController : ControllerBase
        new TodoItemDTO
        {
            Id = todoItem.Id,
-           Name = todoItem.Name,
-           IsComplete = todoItem.IsComplete
+           Titulo = todoItem.Titulo,
+           Descripcion = todoItem.Descripcion,
+           Completa = todoItem.Completa
        };
 }
