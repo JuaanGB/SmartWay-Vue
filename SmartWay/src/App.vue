@@ -1,5 +1,5 @@
 <script setup>
-import { computed, ref, watch } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
 import TarjetaTarea from './components/TarjetaTarea.vue'
 import FormularioNuevaTarea from './components/FormularioNuevaTarea.vue';
 import Encabezado from './components/Encabezado.vue';
@@ -7,19 +7,13 @@ import FormularioFiltrar from './components/FormularioFiltrar.vue';
 import LogDeAcciones from './components/LogDeAcciones.vue';
 import * as op from './operaciones';
 
-let id=1
-const tarjetas = ref([
-  { id: id++, titulo: "Hacer la compra", descripcion: "Comprar leche, pan, huevos y frutas", completa: false },
-  { id: id++, titulo: "Poner una lavadora", descripcion: "Ropa blanca, programa corto", completa: false },
-  { id: id++, titulo: "Sacar al perro", descripcion: "Paseo de 20 minutos por el parque", completa: true },
-  { id: id++, titulo: "Preparar la comida", descripcion: "Hacer pasta con tomate y atún", completa: false },
-  { id: id++, titulo: "Tirar la basura", descripcion: "Contenedor gris y orgánico", completa: true },
-  { id: id++, titulo: "Doblar la ropa", descripcion: "La que está encima de la silla", completa: false },
-  { id: id++, titulo: "Regar las plantas", descripcion: "Las del balcón y el ficus", completa: false },
-  { id: id++, titulo: "Fregar los platos", descripcion: "Después de comer", completa: false },
-  { id: id++, titulo: "Pasar la aspiradora", descripcion: "Salón y pasillo", completa: false },
-  { id: id++, titulo: "Llamar a mamá", descripcion: "Preguntar cómo está y charlar un rato", completa: false }
-])
+
+const tarjetas = ref([])
+onMounted(() => {
+  op.getTareas().then(data => {
+    tarjetas.value = data
+  })
+})
 
 const text = ref();
 const log = ref('');
@@ -65,7 +59,7 @@ function anadirTarea(titulo, descripcion) {
   */
 }
 
-function guardarCambios({ id, titulo, descripcion }) {
+function guardarCambios(id) {
   const tarea = tarjetas.value.find(t => t.id === id)
   if (tarea) {
     op.actualizarTarea(id, tarea.completa, tarjetas)
@@ -75,6 +69,10 @@ function guardarCambios({ id, titulo, descripcion }) {
     */
     log.value += `Tarea '${tarea.titulo}' editada.\n`
   }
+}
+
+function completarTarea(id) {
+  op.cambiarEstadoTarea(tarjetas, id)
 }
 
 </script>
@@ -94,6 +92,7 @@ function guardarCambios({ id, titulo, descripcion }) {
       <TarjetaTarea 
         @borrar-tarea="(id) => borrarTareaPorId(id)" 
         @guardar-cambios="guardarCambios"
+        @completar-tarea="(id) => completarTarea(id)"
         v-for="(tarj, index) in tarjetasFiltradasTitulo" 
         :tarea="tarj" :key="tarj.id"
         :class="{ 'tarea-hecha': tarj.completa}"
