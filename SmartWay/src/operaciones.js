@@ -69,7 +69,36 @@ export function actualizarTarea(id, completa, tareas) {
             t.descripcion = descNuevo
         }
     });
- 
+}
+
+export function editarTarea_PATCH(tareas, id) {
+
+    // Obtenemos valores
+    const tituloNuevo = document.getElementById('editar-titulo-'+id).value
+    const descNuevo = document.getElementById('editar-descripcion-'+id).value
+    const item = { // Sólo propiedades que se van a modificar (PATCH)
+        titulo: tituloNuevo,
+        descripcion: descNuevo
+    }
+
+    // Realizamos petición
+    fetch(`${uri}/${id}`, {
+        method: "PATCH",
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(item)
+    })
+    .catch(error => console.error('Unable to update item.', error));
+
+    // Cambiamos también en la lista original para hacer los cambios reactivos y evitar llamada a la API para obtenerlas
+    tareas.value.forEach(t => {
+        if (t.id == id) {
+            t.titulo = tituloNuevo
+            t.descripcion = descNuevo
+        }
+    });
 }
 
 export function cambiarEstadoTarea(tareas, id) {
@@ -80,6 +109,26 @@ export function cambiarEstadoTarea(tareas, id) {
 
     fetch(`${uri}/${id}`, {
         method: "PUT",
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(tarea)
+    })
+    .catch(error => console.error('Unable to update item.', error));
+}
+
+export function cambiarEstadoTarea_PATCH(tareas, id) {
+    const tarea = tareas.value.find(t => t.id === id)
+    if (!tarea) return
+
+    const body = {
+        completa: !tarea.completa
+    }
+    tarea.completa = !tarea.completa
+
+    fetch(`${uri}/${id}`, {
+        method: "PATCH",
         headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json'

@@ -12,3 +12,12 @@
     </div>
 
 </template>
+
+<style scoped>
+
+textarea {
+    resize: none;
+    vertical-align: bottom;
+}
+
+</style>
