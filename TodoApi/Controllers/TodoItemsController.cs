@@ -2,6 +2,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TodoApi.Models;
+using System.Text.Json;
+using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages;
 
 namespace TodoApi.Controllers;
 
@@ -24,6 +26,7 @@ public class TodoItemsController : ControllerBase
     public async Task<ActionResult<IEnumerable<TodoItemDTO>>> GetTodoItems()
     {
         return await _context.TodoItems
+            .OrderBy(x => x.Id)
             .Select(x => ItemToDTO(x))
             .ToListAsync();
     }
@@ -74,12 +77,21 @@ public class TodoItemsController : ControllerBase
             return NotFound();
         }
 
+        // Añadimos el log de edición
+        var logInfo = new LogInfo
+        {
+            Fecha = DateTime.Now,
+            Info = "Has editado la tarea '" + todoItem.Titulo + "'"
+        };
+        _context.LogInfos.Add(logInfo);
+        await _context.SaveChangesAsync();
+
         return NoContent();
     }
     // </snippet_Update>
 
     [HttpPatch("{id}")]
-    public async Task<IActionResult> PatchTodoItem(long id, TodoItemDTO todoDTO)
+    public async Task<IActionResult> PatchTodoItem(long id, JsonElement json)
     {
         var todoItem = await _context.TodoItems.FindAsync(id);
         if (todoItem == null)
@@ -87,16 +99,40 @@ public class TodoItemsController : ControllerBase
             return NotFound();
         }
 
-        Console.WriteLine("Titulo: " + todoDTO.Titulo);
-        Console.WriteLine("Descripcion: " + todoDTO.Descripcion);
-        Console.WriteLine("Completa: " + todoDTO.Completa);
+        // Añadimos el log de edición
+        var logInfo = new LogInfo
+        { 
+            Fecha = DateTime.Now
+        };
 
-        if (todoDTO.Titulo != null)
-            todoItem.Titulo = todoDTO.Titulo;
-        if (todoDTO.Descripcion != null)
-            todoItem.Descripcion = todoDTO.Descripcion;
-        if (todoDTO.Completa)
-            todoItem.Completa = todoDTO.Completa; 
+        if (json.TryGetProperty("titulo", out var titulo))
+        {
+            var tituloNuevo = titulo.ToString();
+            if (tituloNuevo != todoItem.Titulo)
+            {
+                logInfo.Info = "Título cambiado: " + todoItem.Titulo + " -> " + tituloNuevo;
+                todoItem.Titulo = tituloNuevo;
+                _context.LogInfos.Add(logInfo);
+            }
+            
+        }
+        if (json.TryGetProperty("descripcion", out var descripcion))
+        {
+            var descNueva = descripcion.ToString();
+            if (descNueva != todoItem.Descripcion)
+            {
+                logInfo.Info = "Descripción alterada en tarea '" + todoItem.Titulo + "'";
+                todoItem.Descripcion = descNueva;
+                _context.LogInfos.Add(logInfo);
+            }
+        }
+        if (json.TryGetProperty("completa", out var completa))
+        {
+            var nuevaCompleta = completa.GetBoolean();
+            logInfo.Info = "Tarea '" + todoItem.Titulo + "' " + (nuevaCompleta ? "completada." : "reanudada.");
+            todoItem.Completa = nuevaCompleta;
+            _context.LogInfos.Add(logInfo);            
+        }
 
         try
         {
@@ -106,6 +142,7 @@ public class TodoItemsController : ControllerBase
         {
             return NotFound();
         }
+        await _context.SaveChangesAsync();
 
         return NoContent();
     }
@@ -126,6 +163,14 @@ public class TodoItemsController : ControllerBase
         _context.TodoItems.Add(todoItem);
         await _context.SaveChangesAsync();
 
+        var logInfo = new LogInfo
+        {
+            Fecha = DateTime.Now,
+            Info = "Nueva tarea '" + todoItem.Titulo + "'."
+        };
+        _context.LogInfos.Add(logInfo);
+        await _context.SaveChangesAsync();
+
         return CreatedAtAction(
             nameof(GetTodoItem),
             new { id = todoItem.Id },
@@ -144,6 +189,14 @@ public class TodoItemsController : ControllerBase
         }
 
         _context.TodoItems.Remove(todoItem);
+        await _context.SaveChangesAsync();
+
+        var logInfo = new LogInfo
+        {
+            Fecha = DateTime.Now,
+            Info = "Tarea '" + todoItem.Titulo + "' eliminada."
+        };
+        _context.LogInfos.Add(logInfo);
         await _context.SaveChangesAsync();
 
         return NoContent();

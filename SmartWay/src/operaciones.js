@@ -1,14 +1,15 @@
-const uri = 'http://localhost:5165/api/TodoItems'
+const uri_todo = 'http://localhost:5165/api/TodoItems'
+const uri_log = 'http://localhost:5165/api/Log'
 
 export async function getTareas() {
-    return fetch(uri)
+    return fetch(uri_todo)
         .then( r => r.json())
         .catch( error => console.log("Error al obtener las tareas", error))
 }
 
 /* POST: devuelve en el cuerpo la nueva tarea.
 No hace falta hacer GET a la API porque las podemos ir añadiendo conforme nos dan respuestas 204. */
-export function anadirTarea(tareas) {
+export function anadirTarea(tareas, logTxt) {
     const titulo = document.getElementById("anadir-titulo").value;
     const descripcion = document.getElementById("anadir-descripcion").value;
 
@@ -19,7 +20,7 @@ export function anadirTarea(tareas) {
     };
     console.log(tarea)
 
-    fetch(uri, {
+    fetch(uri_todo, {
         method: 'POST',
         headers: {
             'Accept': 'application/json',
@@ -30,22 +31,25 @@ export function anadirTarea(tareas) {
     .then(r => r.json())
     .then(data => tareas.value.push(data)) /* Para que se actualice con las nuevas tareas de la bbdd */
     .catch(error => console.error('Unable to add item.', error));
+
+    actualizarLog(logTxt)
 }
 
 /* Podemos hacer un filter para que se sincronice con el backend */
-export function eliminarTarea(id, tareas) {
-    fetch(`${uri}/${id}`, {
+export function eliminarTarea(tareas, logTxt, id) {
+    fetch(`${uri_todo}/${id}`, {
         method: "DELETE"
     })
     .catch(error => console.error('Unable to delete item.', error));
 
     tareas.value = tareas.value.filter(t => t.id !== id)
+    actualizarLog(logTxt)
 }
 
 /* Modificamos la tarea manualmente en la lista de tareas. */
 export function actualizarTarea(id, completa, tareas) {
-    const tituloNuevo = document.getElementById('editar-titulo-'+id).value
-    const descNuevo = document.getElementById('editar-descripcion-'+id).value
+    const tituloNuevo = document.getElementById('editar-titulo-'+id).value.trim()
+    const descNuevo = document.getElementById('editar-descripcion-'+id).value.trim()
     const item = {
         id: id, 
         completa: completa,
@@ -53,7 +57,7 @@ export function actualizarTarea(id, completa, tareas) {
         descripcion: descNuevo
     }
 
-    fetch(`${uri}/${id}`, {
+    fetch(`${uri_todo}/${id}`, {
         method: "PUT",
         headers: {
             'Accept': 'application/json',
@@ -71,7 +75,7 @@ export function actualizarTarea(id, completa, tareas) {
     });
 }
 
-export function editarTarea_PATCH(tareas, id) {
+export function editarTarea_PATCH(tareas, logTxt, id) {
 
     // Obtenemos valores
     const tituloNuevo = document.getElementById('editar-titulo-'+id).value
@@ -82,7 +86,7 @@ export function editarTarea_PATCH(tareas, id) {
     }
 
     // Realizamos petición
-    fetch(`${uri}/${id}`, {
+    fetch(`${uri_todo}/${id}`, {
         method: "PATCH",
         headers: {
             'Accept': 'application/json',
@@ -99,6 +103,8 @@ export function editarTarea_PATCH(tareas, id) {
             t.descripcion = descNuevo
         }
     });
+
+    actualizarLog(logTxt)
 }
 
 export function cambiarEstadoTarea(tareas, id) {
@@ -107,7 +113,7 @@ export function cambiarEstadoTarea(tareas, id) {
 
     tarea.completa = !tarea.completa
 
-    fetch(`${uri}/${id}`, {
+    fetch(`${uri_todo}/${id}`, {
         method: "PUT",
         headers: {
             'Accept': 'application/json',
@@ -118,7 +124,7 @@ export function cambiarEstadoTarea(tareas, id) {
     .catch(error => console.error('Unable to update item.', error));
 }
 
-export function cambiarEstadoTarea_PATCH(tareas, id) {
+export function cambiarEstadoTarea_PATCH(tareas, logTxt, id) {
     const tarea = tareas.value.find(t => t.id === id)
     if (!tarea) return
 
@@ -127,7 +133,7 @@ export function cambiarEstadoTarea_PATCH(tareas, id) {
     }
     tarea.completa = !tarea.completa
 
-    fetch(`${uri}/${id}`, {
+    fetch(`${uri_todo}/${id}`, {
         method: "PATCH",
         headers: {
             'Accept': 'application/json',
@@ -136,4 +142,21 @@ export function cambiarEstadoTarea_PATCH(tareas, id) {
         body: JSON.stringify(body)
     })
     .catch(error => console.error('Unable to update item.', error));
+
+    actualizarLog(logTxt)
+}
+
+export function actualizarLog(log) {
+    fetch(`${uri_log}`, {
+        method: "GET",
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => response.json())
+    .then(newLog => {
+        log.value = newLog.join('')
+})
+    .catch(error => console.error('Unable to get log info.', error));
 }
