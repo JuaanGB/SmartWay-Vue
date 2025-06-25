@@ -78,6 +78,38 @@ public class TodoItemsController : ControllerBase
     }
     // </snippet_Update>
 
+    [HttpPatch("{id}")]
+    public async Task<IActionResult> PatchTodoItem(long id, TodoItemDTO todoDTO)
+    {
+        var todoItem = await _context.TodoItems.FindAsync(id);
+        if (todoItem == null)
+        {
+            return NotFound();
+        }
+
+        Console.WriteLine("Titulo: " + todoDTO.Titulo);
+        Console.WriteLine("Descripcion: " + todoDTO.Descripcion);
+        Console.WriteLine("Completa: " + todoDTO.Completa);
+
+        if (todoDTO.Titulo != null)
+            todoItem.Titulo = todoDTO.Titulo;
+        if (todoDTO.Descripcion != null)
+            todoItem.Descripcion = todoDTO.Descripcion;
+        if (todoDTO.Completa)
+            todoItem.Completa = todoDTO.Completa; 
+
+        try
+        {
+            await _context.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException) when (!TodoItemExists(id))
+        {
+            return NotFound();
+        }
+
+        return NoContent();
+    }
+
     // POST: api/TodoItems
     // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
     // <snippet_Create>

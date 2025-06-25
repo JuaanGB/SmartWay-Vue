@@ -62,7 +62,7 @@ function anadirTarea(titulo, descripcion) {
 function guardarCambios(id) {
   const tarea = tarjetas.value.find(t => t.id === id)
   if (tarea) {
-    op.actualizarTarea(id, tarea.completa, tarjetas)
+    op.editarTarea_PATCH(tarjetas, id)
     /*
     tarea.titulo = titulo
     tarea.descripcion = descripcion
@@ -72,7 +72,7 @@ function guardarCambios(id) {
 }
 
 function completarTarea(id) {
-  op.cambiarEstadoTarea(tarjetas, id)
+  op.cambiarEstadoTarea_PATCH(tarjetas, id)
 }
 
 </script>

@@ -133,7 +133,7 @@ export function cambiarEstadoTarea_PATCH(tareas, id) {
             'Accept': 'application/json',
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify(tarea)
+        body: JSON.stringify(body)
     })
     .catch(error => console.error('Unable to update item.', error));
 }
