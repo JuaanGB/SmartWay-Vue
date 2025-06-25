@@ -32,10 +32,6 @@ function borrarTareaPorId(id) {
 }
 
 function anadirTarea(titulo, descripcion) {
-  if (!titulo) {
-    log.value += `Título necesario al crear una tarea.\n`
-    return
-  }
   op.anadirTarea(tarjetas, log)
 }
 
@@ -43,7 +39,6 @@ function guardarCambios(id) {
   const tarea = tarjetas.value.find(t => t.id === id)
   if (tarea) {
     op.editarTarea_PATCH(tarjetas, log, id)
-    log.value += `Tarea '${tarea.titulo}' editada.\n`
   }
 }
 
@@ -63,7 +58,7 @@ function completarTarea(id) {
       <FormularioFiltrar @buscar-tarea="buscarTarea"></FormularioFiltrar>
       <LogDeAcciones :texto="log"></LogDeAcciones>
     </section>
-    <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 justify-center gap-2 pb-4">
+    <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 justify-center gap-2 pb-4 m-2">
       <h2 class="divider col-start-1 col-end-2 md:col-end-4 text-2xl">Lista de tareas</h2>
       <TarjetaTarea 
         @borrar-tarea="(id) => borrarTareaPorId(id)" 

@@ -44,7 +44,7 @@
 
 
 <template>
-    <article class="card bg-yellow-300 p-4 shadow-sm w-[400px] m-auto">
+    <article class="card bg-yellow-300 p-4 shadow-sm w-full m-auto">
         <div class="card-title">
             <h2 v-if="!editMode" @click="tareaHecha($event)">{{ tarea.titulo || "* No hay título" }}</h2>
             <textarea :id="'editar-titulo-'+id" v-else :disabled="!editMode" v-model="tituloEdit" class="textarea bg-yellow-100 text-lg font-bold border-1 p-1 w-auto whitespace-break-spaces"></textarea>

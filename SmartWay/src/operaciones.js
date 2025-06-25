@@ -28,11 +28,10 @@ export function anadirTarea(tareas, logTxt) {
         },
         body: JSON.stringify(tarea)
     })
+    .then(() => actualizarLog(logTxt))
     .then(r => r.json())
     .then(data => tareas.value.push(data)) /* Para que se actualice con las nuevas tareas de la bbdd */
     .catch(error => console.error('Unable to add item.', error));
-
-    actualizarLog(logTxt)
 }
 
 /* Podemos hacer un filter para que se sincronice con el backend */
@@ -40,10 +39,10 @@ export function eliminarTarea(tareas, logTxt, id) {
     fetch(`${uri_todo}/${id}`, {
         method: "DELETE"
     })
+    .then(() => actualizarLog(logTxt))
     .catch(error => console.error('Unable to delete item.', error));
 
     tareas.value = tareas.value.filter(t => t.id !== id)
-    actualizarLog(logTxt)
 }
 
 /* Modificamos la tarea manualmente en la lista de tareas. */
@@ -94,6 +93,7 @@ export function editarTarea_PATCH(tareas, logTxt, id) {
         },
         body: JSON.stringify(item)
     })
+    .then(() => actualizarLog(logTxt))
     .catch(error => console.error('Unable to update item.', error));
 
     // Cambiamos también en la lista original para hacer los cambios reactivos y evitar llamada a la API para obtenerlas
@@ -104,7 +104,6 @@ export function editarTarea_PATCH(tareas, logTxt, id) {
         }
     });
 
-    actualizarLog(logTxt)
 }
 
 export function cambiarEstadoTarea(tareas, id) {
@@ -141,9 +140,9 @@ export function cambiarEstadoTarea_PATCH(tareas, logTxt, id) {
         },
         body: JSON.stringify(body)
     })
+    .then(() => actualizarLog(logTxt))
     .catch(error => console.error('Unable to update item.', error));
 
-    actualizarLog(logTxt)
 }
 
 export function actualizarLog(log) {
@@ -155,8 +154,6 @@ export function actualizarLog(log) {
         }
     })
     .then(response => response.json())
-    .then(newLog => {
-        log.value = newLog.join('')
-})
+    .then(newLog => log.value = newLog.join(''))
     .catch(error => console.error('Unable to get log info.', error));
 }

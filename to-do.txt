@@ -1,0 +1,4 @@
+- Cambiar getElementById por parámetros -> mejor independencia al cambiar nombres en el dom
+- Diseño reactivo
+- Terminar las llamadas a la api del log
+- Mirar acerca de v-model entre componentes
