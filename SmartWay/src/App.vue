@@ -53,13 +53,13 @@ function completarTarea(id) {
     <Encabezado>Anótalo!</Encabezado>
   </header>
   <main class="bg-yellow-100">
-    <section class="p-10 flex flex-col lg:flex-row justify-center mx-auto gap-2">
+    <section class="p-10 flex flex-col md:flex-row justify-center gap-2">
       <FormularioNuevaTarea @anadir-tarea="(titulo, descripcion) => anadirTarea(titulo, descripcion)"></FormularioNuevaTarea>
       <FormularioFiltrar @buscar-tarea="buscarTarea"></FormularioFiltrar>
       <LogDeAcciones :texto="log"></LogDeAcciones>
     </section>
     <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 justify-center gap-2 pb-4 m-2">
-      <h2 class="divider col-start-1 col-end-2 md:col-end-4 text-2xl">Lista de tareas</h2>
+      <h2 class="divider col-start-1 col-end-2 md:col-end-3 lg:col-end-4 text-2xl">Lista de tareas</h2>
       <TarjetaTarea 
         @borrar-tarea="(id) => borrarTareaPorId(id)" 
         @guardar-cambios="guardarCambios"

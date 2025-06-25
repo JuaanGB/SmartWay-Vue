@@ -28,9 +28,9 @@ export function anadirTarea(tareas, logTxt) {
         },
         body: JSON.stringify(tarea)
     })
-    .then(() => actualizarLog(logTxt))
     .then(r => r.json())
     .then(data => tareas.value.push(data)) /* Para que se actualice con las nuevas tareas de la bbdd */
+    .then(() => actualizarLog(logTxt))
     .catch(error => console.error('Unable to add item.', error));
 }
 
