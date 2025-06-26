@@ -9,16 +9,13 @@ export async function getTareas() {
 
 /* POST: devuelve en el cuerpo la nueva tarea.
 No hace falta hacer GET a la API porque las podemos ir añadiendo conforme nos dan respuestas 204. */
-export function anadirTarea(tareas, logTxt) {
-    const titulo = document.getElementById("anadir-titulo").value;
-    const descripcion = document.getElementById("anadir-descripcion").value;
+export function anadirTarea({tareas, log}, {titulo, descripcion}) {
 
     const tarea = {
         completa: false,
         titulo: titulo.trim(),
         descripcion: descripcion.trim()
     };
-    console.log(tarea)
 
     fetch(uri_todo, {
         method: 'POST',
@@ -30,25 +27,23 @@ export function anadirTarea(tareas, logTxt) {
     })
     .then(r => r.json())
     .then(data => tareas.value.push(data)) /* Para que se actualice con las nuevas tareas de la bbdd */
-    .then(() => actualizarLog(logTxt))
+    .then(() => actualizarLog(log))
     .catch(error => console.error('Unable to add item.', error));
 }
 
 /* Podemos hacer un filter para que se sincronice con el backend */
-export function eliminarTarea(tareas, logTxt, id) {
+export function eliminarTarea({tareas, log}, {id}) {
     fetch(`${uri_todo}/${id}`, {
         method: "DELETE"
     })
-    .then(() => actualizarLog(logTxt))
+    .then(() => actualizarLog(log))
     .catch(error => console.error('Unable to delete item.', error));
 
     tareas.value = tareas.value.filter(t => t.id !== id)
 }
 
 /* Modificamos la tarea manualmente en la lista de tareas. */
-export function actualizarTarea(id, completa, tareas) {
-    const tituloNuevo = document.getElementById('editar-titulo-'+id).value.trim()
-    const descNuevo = document.getElementById('editar-descripcion-'+id).value.trim()
+export function actualizarTarea({tareas, log}, {id, tituloNuevo, descNuevo}) {
     const item = {
         id: id, 
         completa: completa,
@@ -64,8 +59,10 @@ export function actualizarTarea(id, completa, tareas) {
         },
         body: JSON.stringify(item)
     })
+    .then(() => actualizarLog(log))
     .catch(error => console.error('Unable to update item.', error));
 
+    // Cambiamos también en la lista original para hacer los cambios reactivos y evitar llamada a la API para obtenerlas
     tareas.value.forEach(t => {
         if (t.id == id) {
             t.titulo = tituloNuevo
@@ -74,11 +71,9 @@ export function actualizarTarea(id, completa, tareas) {
     });
 }
 
-export function editarTarea_PATCH(tareas, logTxt, id) {
+export function editarTarea_PATCH({tareas, log}, {id, tituloNuevo, descNuevo}) {
 
     // Obtenemos valores
-    const tituloNuevo = document.getElementById('editar-titulo-'+id).value
-    const descNuevo = document.getElementById('editar-descripcion-'+id).value
     const item = { // Sólo propiedades que se van a modificar (PATCH)
         titulo: tituloNuevo,
         descripcion: descNuevo
@@ -93,7 +88,7 @@ export function editarTarea_PATCH(tareas, logTxt, id) {
         },
         body: JSON.stringify(item)
     })
-    .then(() => actualizarLog(logTxt))
+    .then(() => actualizarLog(log))
     .catch(error => console.error('Unable to update item.', error));
 
     // Cambiamos también en la lista original para hacer los cambios reactivos y evitar llamada a la API para obtenerlas
@@ -106,7 +101,7 @@ export function editarTarea_PATCH(tareas, logTxt, id) {
 
 }
 
-export function cambiarEstadoTarea(tareas, id) {
+export function cambiarEstadoTarea({tareas, log}, {id}) {
     const tarea = tareas.value.find(t => t.id === id)
     if (!tarea) return
 
@@ -120,10 +115,11 @@ export function cambiarEstadoTarea(tareas, id) {
         },
         body: JSON.stringify(tarea)
     })
+    .then(() => actualizarLog(log))
     .catch(error => console.error('Unable to update item.', error));
 }
 
-export function cambiarEstadoTarea_PATCH(tareas, logTxt, id) {
+export function cambiarEstadoTarea_PATCH({tareas, log}, {id}) {
     const tarea = tareas.value.find(t => t.id === id)
     if (!tarea) return
 
@@ -140,7 +136,7 @@ export function cambiarEstadoTarea_PATCH(tareas, logTxt, id) {
         },
         body: JSON.stringify(body)
     })
-    .then(() => actualizarLog(logTxt))
+    .then(() => actualizarLog(log))
     .catch(error => console.error('Unable to update item.', error));
 
 }
